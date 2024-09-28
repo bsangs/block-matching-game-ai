@@ -2,27 +2,25 @@ import React from 'react';
 
 function NetworkVisualization({ network }) {
   const layerPositions = [];
-  const layerSpacing = 150;
-  const neuronSpacing = 30;
+  const layerSpacing = 100; // 레이어 간 간격 축소
+  const neuronSpacing = 20; // 뉴런 간 간격 축소
   let maxNeurons = 0;
 
-  for (let i = 0; i < network.layers.length; i++) {
-    const layer = network.layers[i];
-    const x = i * layerSpacing;
-    const yOffset = (layer.length * neuronSpacing) / 2;
-    const neurons = [];
-    for (let j = 0; j < layer.length; j++) {
-      const y = j * neuronSpacing - yOffset;
-      neurons.push({ x, y });
-    }
+  network.layers.forEach((layer, i) => {
+    const x = i * layerSpacing + 50; // 시작 좌표 조정
+    const yOffset = (layer.length * neuronSpacing) / 2 - neuronSpacing / 2;
+    const neurons = layer.map((_, j) => ({
+      x,
+      y: j * neuronSpacing - yOffset
+    }));
     layerPositions.push(neurons);
     if (layer.length > maxNeurons) {
       maxNeurons = layer.length;
     }
-  }
+  });
 
-  const width = network.layers.length * layerSpacing;
-  const height = maxNeurons * neuronSpacing;
+  const width = network.layers.length * layerSpacing + 100;
+  const height = maxNeurons * neuronSpacing + 100;
 
   return (
     <div className="network-visualization">
@@ -35,25 +33,18 @@ function NetworkVisualization({ network }) {
           return layer.map((neuron, neuronIndex) => {
             const { x: x1, y: y1 } = layerPositions[layerIndex][neuronIndex];
             return prevLayer.map((_, prevNeuronIndex) => {
-              const { x: x2, y: y2 } =
-                layerPositions[layerIndex - 1][prevNeuronIndex];
-              const weight =
-                neuron.weights[prevNeuronIndex];
-              const weightAbs = Math.abs(weight);
-              const strokeWidth = Math.min(
-                Math.max(weightAbs * 2, 0.5),
-                5
-              );
-              const color = weight > 0 ? 'blue' : 'red';
+              const { x: x2, y: y2 } = layerPositions[layerIndex - 1][prevNeuronIndex];
+              const weight = neuron.weights[prevNeuronIndex];
+              const color = weight > 0 ? 'rgba(0, 123, 255, 0.5)' : 'rgba(220, 53, 69, 0.5)';
               return (
                 <line
                   key={`${layerIndex}-${neuronIndex}-${prevNeuronIndex}`}
-                  x1={x2 + layerSpacing}
-                  y1={y2 + height / 2}
-                  x2={x1 + layerSpacing}
-                  y2={y1 + height / 2}
+                  x1={x2 + 25} // 뉴런 반지름 조정에 맞춰 위치 수정
+                  y1={y2 + 25}
+                  x2={x1 + 25}
+                  y2={y1 + 25}
                   stroke={color}
-                  strokeWidth={strokeWidth}
+                  strokeWidth={1}
                 />
               );
             });
@@ -64,11 +55,10 @@ function NetworkVisualization({ network }) {
           layer.map((neuron, neuronIndex) => (
             <circle
               key={`${layerIndex}-${neuronIndex}`}
-              cx={neuron.x + layerSpacing}
-              cy={neuron.y + height / 2}
-              r={10}
-              fill="white"
-              stroke="black"
+              cx={neuron.x + 25}
+              cy={neuron.y + 25}
+              r={8} // 반지름 축소
+              className="neuron"
             />
           ))
         )}
