@@ -1,13 +1,73 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+.app {
+  text-align: center;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+.game {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.board {
+  display: inline-block;
+  border: 2px solid #333;
+}
+
+.board-row {
+  display: flex;
+}
+
+.board-cell {
+  width: 30px;
+  height: 30px;
+  border: 1px solid #aaa;
+  background-color: #fff;
+  cursor: pointer;
+}
+
+.board-cell.filled {
+  background-color: #333;
+}
+
+.board-cell.last-placed {
+  background-color: #4caf50; /* 녹색 */
+}
+
+.board-cell.to-be-cleared {
+  background-color: #f44336; /* 빨간색 */
+}
+
+.controls {
+  margin-top: 20px;
+}
+
+.blocks {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.block {
+  margin: 0 10px;
+  cursor: pointer;
+}
+
+.block.selected {
+  border: 2px solid red;
+}
+
+.block-row {
+  display: flex;
+}
+
+.block-cell {
+  width: 20px;
+  height: 20px;
+  border: 1px solid #aaa;
+  background-color: #fff;
+}
+
+.block-cell.filled {
+  background-color: #666;
 }
