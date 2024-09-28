@@ -10,17 +10,38 @@ export const blockShapes = [
     // 일자 5블록
     [[1, 1, 1, 1, 1]],
     // ㄴ자 블록 (긴 쪽)
-    [[1, 0], [1, 0], [1, 1]],
+    [
+      [1, 0],
+      [1, 0],
+      [1, 1],
+    ],
     // ㄱ자 블록
-    [[0, 1], [0, 1], [1, 1]],
+    [
+      [0, 1],
+      [0, 1],
+      [1, 1],
+    ],
     // z 모양 블록
-    [[1, 1, 0], [0, 1, 1]],
+    [
+      [1, 1, 0],
+      [0, 1, 1],
+    ],
     // ㅗ 모양 블록
-    [[1, 1, 1], [0, 1, 0]],
+    [
+      [1, 1, 1],
+      [0, 1, 0],
+    ],
     // 2x2 블록
-    [[1, 1], [1, 1]],
+    [
+      [1, 1],
+      [1, 1],
+    ],
     // 3x3 블록
-    [[1, 1, 1], [1, 1, 1], [1, 1, 1]],
+    [
+      [1, 1, 1],
+      [1, 1, 1],
+      [1, 1, 1],
+    ],
   ];
   
   export function generateBlocks(n) {
@@ -45,7 +66,7 @@ export const blockShapes = [
     return true; // 배치 불가능하므로 게임 오버
   }
   
-  function canPlaceBlock(board, block, startRow, startCol) {
+  export function canPlaceBlock(board, block, startRow, startCol) {
     for (let i = 0; i < block.length; i++) {
       for (let j = 0; j < block[i].length; j++) {
         if (block[i][j]) {
@@ -123,8 +144,10 @@ export const blockShapes = [
       if (columnFilled) {
         // 라인 마크
         for (let i = 0; i < 8; i++) {
-          markedBoard[i][j] = -1;
-          blocksCleared++;
+          if (markedBoard[i][j] !== -1) {
+            markedBoard[i][j] = -1;
+            blocksCleared++;
+          }
         }
         linesCleared++;
       }
@@ -132,7 +155,6 @@ export const blockShapes = [
   
     return { markedBoard, linesCleared, blocksCleared };
   }
-  
   
   export function checkAndClearLines(board) {
     let clearedBoard = board.map((row) => row.slice());
@@ -172,5 +194,4 @@ export const blockShapes = [
   
     return { clearedBoard, linesCleared, blocksCleared };
   }
-  
   

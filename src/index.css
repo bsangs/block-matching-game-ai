@@ -1,3 +1,4 @@
+/* 기존 스타일 */
 .app {
   text-align: center;
 }
@@ -70,4 +71,25 @@
 
 .block-cell.filled {
   background-color: #666;
+}
+
+/* 추가된 스타일 */
+.generation-info {
+  margin-top: 20px;
+}
+
+.network-visualization {
+  margin-top: 20px;
+}
+
+.network-visualization svg {
+  border: 1px solid #ccc;
+}
+
+.network-visualization circle {
+  fill: #2196f3;
+}
+
+.network-visualization line {
+  stroke: black;
 }
