@@ -45,8 +45,8 @@ class NeuralNetwork {
     }
   
     activation(x) {
-      // ReLU 함수 사용
-      return x > 0 ? x : 0;
+      // 시그모이드 함수 사용
+      return 1 / (1 + Math.exp(-x));
     }
   
     static crossover(parentA, parentB) {
@@ -79,16 +79,16 @@ class NeuralNetwork {
       for (let layer of this.layers) {
         for (let neuron of layer) {
           if (Math.random() < rate) {
-            neuron.bias += Math.random() * 0.2 - 0.1;
+            neuron.bias += Math.random() * 0.02 - 0.01; // 변경 폭을 -0.01 ~ 0.01로 조정
           }
           for (let i = 0; i < neuron.weights.length; i++) {
             if (Math.random() < rate) {
-              neuron.weights[i] += Math.random() * 0.2 - 0.1;
+              neuron.weights[i] += Math.random() * 0.02 - 0.01; // 변경 폭을 -0.01 ~ 0.01로 조정
             }
           }
         }
       }
-    }
+    }    
   }
   
   export default NeuralNetwork;

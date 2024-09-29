@@ -2,7 +2,7 @@ import NeuralNetwork from './NeuralNetwork';
 import { canPlaceBlock } from './utils';
 
 class GeneticAlgorithm {
-  constructor(populationSize = 10) {
+  constructor(populationSize = 20) { // 인구 크기 증가
     this.populationSize = populationSize;
     this.population = [];
     this.generation = 1;
@@ -15,10 +15,11 @@ class GeneticAlgorithm {
   nextGeneration() {
     this.evaluateFitness();
     this.selection();
-    this.crossover();
-    this.mutation();
+    const offspring = this.crossover();
+    this.mutation(offspring);
+    this.population = this.population.concat(offspring);
     this.generation++;
-    // 새로운 세대를 위해 각 AIPlayer의 gameOver 플래그와 fitness를 초기화
+    // 각 AIPlayer의 gameOver 플래그와 fitness 초기화
     this.population.forEach((ai) => {
       ai.gameOver = false;
       ai.fitness = 0;
@@ -30,28 +31,37 @@ class GeneticAlgorithm {
   }
 
   selection() {
-    // 상위 2개 유전자 선택
+    // 상위 20% 개체 선택
+    const retainRate = 0.2; // 20% 유지 (인구 크기가 20이면 상위 4개 유지)
+    const retainLength = Math.floor(this.populationSize * retainRate);
     this.population.sort((a, b) => b.fitness - a.fitness);
-    this.population = this.population.slice(0, 2);
+    this.population = this.population.slice(0, retainLength);
   }
 
   crossover() {
     const offspring = [];
     while (this.population.length + offspring.length < this.populationSize) {
-      const parentA = this.population[0];
-      const parentB = this.population[1];
+      const parentA = this.randomSelection();
+      const parentB = this.randomSelection();
       const childNetwork = NeuralNetwork.crossover(parentA.network, parentB.network);
       offspring.push(new AIPlayer(childNetwork));
     }
-    this.population = this.population.concat(offspring);
+    return offspring;
   }
 
-  mutation() {
-    for (let ai of this.population) {
-      ai.network.mutate(0.1); // 돌연변이 확률 조정 가능
+  // 부모 개체를 무작위로 선택하는 함수
+  randomSelection() {
+    const index = Math.floor(Math.random() * this.population.length);
+    return this.population[index];
+  }
+
+  mutation(offspring) {
+    for (let ai of offspring) {
+      ai.network.mutate(0.05); // 돌연변이 확률을 낮게 설정
     }
   }
 }
+
 
 class AIPlayer {
   constructor(network = null) {

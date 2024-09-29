@@ -77,7 +77,7 @@ function GameInstance({ aiPlayer, isAutoPlay, onGameOver, index, gameOverStatus 
         if (gameOverRef.current) {
           onGameOver(scoreRef.current);
         }
-      }, 1); // 0.05초마다 실행
+      }, 1);
 
       // 컴포넌트 언마운트 시 인터벌 정리
       return () => {
