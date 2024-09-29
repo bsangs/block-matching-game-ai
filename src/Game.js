@@ -14,7 +14,6 @@ import React, {
   } from './utils';
   import GeneticAlgorithm from './GeneticAlgorithm';
   import GenerationInfo from './GenerationInfo';
-  import NetworkVisualization from './NetworkVisualization';
   
   function Game() {
     const initialBoard = Array(8)
@@ -336,13 +335,6 @@ import React, {
               style={{ writingMode: 'bt-lr', height: '200px' }} // 수직 슬라이더 스타일
             />
           </div>
-          
-          {/* 기타 컴포넌트 */}
-          {/* {geneticAlgorithm && (
-            <NetworkVisualization
-              network={geneticAlgorithm.getCurrentAI().network}
-            />
-          )} */}
         </div>
   
         <button onClick={toggleAutoPlay}>
