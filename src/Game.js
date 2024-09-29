@@ -21,8 +21,10 @@ function Game() {
   }, []);
 
   // 게임 종료 시 호출되는 함수
-  const handleGameOver = (score, aiPlayer) => {
+  const handleGameOver = (index, score, aiPlayer) => {
     aiPlayer.setFitness(score);
+
+    console.log(`[${index}] stop game ${score}`)
 
     setGameOverCounts((prevCount) => prevCount + 1);
     setBestScore((prevBest) => Math.max(prevBest, score));
@@ -57,9 +59,10 @@ function Game() {
         {aiPlayers.map((aiPlayer, index) => (
           <GameInstance
             key={index}
+            index={index}
             aiPlayer={aiPlayer}
             isAutoPlay={isAutoPlay}
-            onGameOver={(score) => handleGameOver(score, aiPlayer)}
+            onGameOver={(score) => handleGameOver(index, score, aiPlayer)}
           />
         ))}
       </div>
