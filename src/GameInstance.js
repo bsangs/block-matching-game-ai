@@ -8,7 +8,7 @@ import {
   checkAndMarkLines,
 } from './utils';
 
-function GameInstance({ aiPlayer, isAutoPlay, onGameOver, index }) {
+function GameInstance({ aiPlayer, isAutoPlay, onGameOver, index, gameOverStatus }) {
   const initialBoard = Array(8).fill(null).map(() => Array(8).fill(0));
 
   const [board, setBoard] = useState(initialBoard);
@@ -60,13 +60,31 @@ function GameInstance({ aiPlayer, isAutoPlay, onGameOver, index }) {
   }, [aiPlayer]);
 
   useEffect(() => {
-    if (gameOver) {
-      onGameOver(scoreRef.current)
-      console.log(`[${index}] GO`)
-    } else {
-      console.log(`${index} NGO`)
+    if(!gameOverStatus[index]) {
+      if (gameOverRef.current) {
+        onGameOver(scoreRef.current);
+        console.log(`[${index}] GO`);
+      } else {
+        console.log(`${index} NGO`);
+      }
     }
-  }, [gameOver])
+  }, [gameOverRef, index, scoreRef]);
+
+  // 주기적으로 gameOver 상태 체크
+  useEffect(() => {
+    if (!gameOverStatus[index]) {
+      const checkGameOverInterval = setInterval(() => {
+        if (gameOverRef.current) {
+          onGameOver(scoreRef.current);
+        }
+      }, 1); // 0.05초마다 실행
+
+      // 컴포넌트 언마운트 시 인터벌 정리
+      return () => {
+        clearInterval(checkGameOverInterval);
+      };
+    }
+  }, [onGameOver, index]);
 
   // AI 플레이 루프 설정
   useEffect(() => {
@@ -94,11 +112,6 @@ function GameInstance({ aiPlayer, isAutoPlay, onGameOver, index }) {
         aiPlayerRef.current.gameOver
       ) {
 
-        // onGameOver 호출 추가: 게임 오버 상태에서 루프를 중지할 때 onGameOver 호출
-        if (gameOverRef.current || (aiPlayerRef.current && aiPlayerRef.current.gameOver)) {
-          onGameOver(scoreRef.current);
-        }
-
         clearInterval(intervalRef.current);
         intervalRef.current = null;
         return;
@@ -106,7 +119,6 @@ function GameInstance({ aiPlayer, isAutoPlay, onGameOver, index }) {
 
       const currentBoard = boardRef.current;
       const blocks = currentBlocksRef.current;
-      const currentScore = scoreRef.current;
 
       const action = aiPlayerRef.current.getAction(currentBoard, blocks);
 

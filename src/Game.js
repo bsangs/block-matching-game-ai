@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import GameInstance from './GameInstance';
 import GeneticAlgorithm from './GeneticAlgorithm';
 import GenerationInfo from './GenerationInfo';
@@ -11,7 +11,7 @@ function Game() {
 
   const [isAutoPlay, setIsAutoPlay] = useState(false);
   const [aiPlayers, setAiPlayers] = useState([]);
-  const [gameOverCounts, setGameOverCounts] = useState(0);
+  const [gameOverStatus, setGameOverStatus] = useState({}); // 각 플레이어의 게임 오버 상태를 추적
 
   // 초기 유전 알고리즘 설정
   useEffect(() => {
@@ -21,36 +21,39 @@ function Game() {
   }, []);
 
   // 게임 종료 시 호출되는 함수
-  const handleGameOver = (index, score, aiPlayer) => {
+  const handleGameOver = useCallback((index, score, aiPlayer) => {
     aiPlayer.setFitness(score);
-
-    console.log(`[${index}] stop game ${score}`)
-
-    setGameOverCounts((prevCount) => prevCount + 1);
-    setBestScore((prevBest) => Math.max(prevBest, score));
-  };
+    console.log(`[${index}] stop game ${score}`);
+    setGameOverStatus(prevStatus => ({
+      ...prevStatus,
+      [index]: true,
+    }));
+    setBestScore(prevBest => Math.max(prevBest, score));
+  }, []);
 
   // 게임 재시작을 관리하는 useEffect
   useEffect(() => {
-    if (isAutoPlay && gameOverCounts === aiPlayers.length) {
+    if (isAutoPlay && Object.keys(gameOverStatus).length === aiPlayers.length && aiPlayers.length > 0) {
       // 모든 게임이 종료되었고 자동 재생이 활성화된 경우
       geneticAlgorithm.nextGeneration();
       setCurrentGeneration(geneticAlgorithm.generation + 1); // 세대 업데이트
       setAiPlayers([...geneticAlgorithm.population]); // 새로운 세대의 AI 플레이어 설정
-      setGameOverCounts(0); // 게임 종료 카운트 초기화
+      setGameOverStatus({}); // 게임 오버 상태 초기화
     } else {
-      console.log(isAutoPlay, gameOverCounts, aiPlayers.length)
+      console.log(isAutoPlay, gameOverStatus, aiPlayers.length);
     }
-  }, [gameOverCounts, isAutoPlay, aiPlayers.length, geneticAlgorithm]);
+  }, [gameOverStatus, isAutoPlay, aiPlayers.length, geneticAlgorithm]);
 
   // 자동 재생 토글 함수
   const toggleAutoPlay = () => {
-    setIsAutoPlay((prev) => !prev);
+    setIsAutoPlay(prev => !prev);
+    if (!isAutoPlay) {
+      setGameOverStatus({}); // 자동 재생 시작 시 상태 초기화
+    }
   };
 
   return (
     <div className="game">
-      <h1>블록 맞추기 게임</h1>
       <GenerationInfo generation={currentGeneration} bestScore={bestScore} />
       <button onClick={toggleAutoPlay}>
         {isAutoPlay ? '자동 플레이 중지' : '자동 플레이 시작'}
@@ -63,6 +66,7 @@ function Game() {
             aiPlayer={aiPlayer}
             isAutoPlay={isAutoPlay}
             onGameOver={(score) => handleGameOver(index, score, aiPlayer)}
+            gameOverStatus={gameOverStatus}
           />
         ))}
       </div>
