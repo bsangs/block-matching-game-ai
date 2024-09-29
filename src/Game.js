@@ -34,6 +34,9 @@ import React, {
     const [currentGeneration, setCurrentGeneration] = useState(1);
     const [bestScore, setBestScore] = useState(0);
     const [isAutoPlay, setIsAutoPlay] = useState(false);
+    
+    // 속도 상태 추가
+    const [speed, setSpeed] = useState(1); // 기본 속도 1ms
   
     // Refs for the latest state
     const boardRef = useRef(board);
@@ -43,6 +46,7 @@ import React, {
     const scoreRef = useRef(score);
     const bestScoreRef = useRef(bestScore);
     const isAutoPlayRef = useRef(isAutoPlay);
+    const speedRef = useRef(speed);
   
     const intervalRef = useRef(null);
   
@@ -74,6 +78,10 @@ import React, {
     useEffect(() => {
       isAutoPlayRef.current = isAutoPlay;
     }, [isAutoPlay]);
+  
+    useEffect(() => {
+      speedRef.current = speed;
+    }, [speed]);
   
     // 초기 게임 설정
     useEffect(() => {
@@ -167,9 +175,7 @@ import React, {
             if (checkGameOver(newBoard, moreBlocks)) {
               setGameOver(true);
               ai.setFitness(scoreRef.current);
-              if (scoreRef.current > bestScoreRef.current) {
-                setBestScore(scoreRef.current);
-              }
+              setBestScore((prevBest) => Math.max(prevBest, scoreRef.current));
             } else {
               setCurrentBlocks(moreBlocks);
             }
@@ -178,13 +184,12 @@ import React, {
           // 배치 불가 시 게임 오버
           setGameOver(true);
           ai.setFitness(scoreRef.current);
-          if (scoreRef.current > bestScoreRef.current) {
-            setBestScore(scoreRef.current);
-          }
+          setBestScore((prevBest) => Math.max(prevBest, scoreRef.current));
         }
       } else {
         // 가능한 액션이 없을 경우 게임 오버 및 세대 갱신
         setGameOver(true);
+        setBestScore((prevBest) => Math.max(prevBest, scoreRef.current));
         ga.currentIndex++;
         if (ga.currentIndex >= ga.populationSize) {
           ga.nextGeneration();
@@ -194,7 +199,7 @@ import React, {
       }
     }, []);
   
-    // AutoPlay 설정 및 aiPlay 호출 간격 변경 (2ms)
+    // AutoPlay 설정 및 aiPlay 호출 간격 변경
     useEffect(() => {
       if (isAutoPlay && geneticAlgorithm) {
         if (intervalRef.current) {
@@ -216,7 +221,7 @@ import React, {
             setCurrentBlocks(generateBlocks(3));
             setSelectedBlockIndex(null);
           }
-        }, 2); // 2ms 간격으로 aiPlay 호출
+        }, speed); // 슬라이더로 조절된 speed 사용
       } else {
         if (intervalRef.current) {
           clearInterval(intervalRef.current);
@@ -230,7 +235,7 @@ import React, {
           clearInterval(intervalRef.current);
         }
       };
-    }, [isAutoPlay, geneticAlgorithm, aiPlay]);
+    }, [isAutoPlay, geneticAlgorithm, aiPlay, speed]); // speed를 의존성 배열에 추가
   
     const handleBlockSelect = (blockIndex) => {
       setSelectedBlockIndex(blockIndex);
@@ -300,30 +305,49 @@ import React, {
         <div className="controls">
           <h2>점수: {score}</h2>
           {gameOver && <h2>게임 오버!</h2>}
-            <div className="blocks">
-              {currentBlocks.map((block, index) => (
-                <Block
-                  key={index}
-                  block={block}
-                  blockIndex={index}
-                  isSelected={selectedBlockIndex === index}
-                  onSelectBlock={handleBlockSelect}
-                />
-              ))}
-            </div>
-          <button onClick={toggleAutoPlay}>
-            {isAutoPlay ? '자동 플레이 중지' : '자동 플레이 시작'}
-          </button>
+          <div className="blocks">
+            {currentBlocks.map((block, index) => (
+              <Block
+                key={index}
+                block={block}
+                blockIndex={index}
+                isSelected={selectedBlockIndex === index}
+                onSelectBlock={handleBlockSelect}
+              />
+            ))}
+          </div>
+          
           <GenerationInfo
             generation={currentGeneration}
             bestScore={bestScore}
           />
-          {geneticAlgorithm && (
+          
+          {/* 속도 조절 슬라이더 추가 */}
+          <div className="speed-control">
+            <label htmlFor="speed-slider">속도: {speed}ms</label>
+            <input
+              id="speed-slider"
+              type="range"
+              min="1"
+              max="1000"
+              value={speed}
+              onChange={(e) => setSpeed(Number(e.target.value))}
+              orient="vertical"
+              style={{ writingMode: 'bt-lr', height: '200px' }} // 수직 슬라이더 스타일
+            />
+          </div>
+          
+          {/* 기타 컴포넌트 */}
+          {/* {geneticAlgorithm && (
             <NetworkVisualization
               network={geneticAlgorithm.getCurrentAI().network}
             />
-          )}
+          )} */}
         </div>
+  
+        <button onClick={toggleAutoPlay}>
+            {isAutoPlay ? '자동 플레이 중지' : '자동 플레이 시작'}
+        </button>
       </div>
     );
   }

@@ -53,7 +53,7 @@ class GeneticAlgorithm {
 
   mutation() {
     for (let ai of this.population) {
-      ai.network.mutate(0.1); // 10% 확률로 돌연변이
+      ai.network.mutate(0.01); // 10% 확률로 돌연변이
     }
   }
 

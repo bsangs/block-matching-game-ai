@@ -41,12 +41,14 @@
 
 .controls {
   margin-top: 20px;
+  height: 350px;
 }
 
 .blocks {
   display: flex;
   justify-content: center;
   margin-top: 20px;
+  height: 80px;
 }
 
 .block {
