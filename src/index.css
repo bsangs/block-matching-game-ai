@@ -47,12 +47,11 @@
 .blocks {
   display: flex;
   justify-content: center;
-  margin-top: 20px;
-  height: 80px;
+  margin-top: 10px;
 }
 
 .block {
-  margin: 0 10px;
+  margin: 0 5px;
   cursor: pointer;
 }
 
@@ -65,8 +64,8 @@
 }
 
 .block-cell {
-  width: 20px;
-  height: 20px;
+  width: 15px;
+  height: 15px;
   border: 1px solid #aaa;
   background-color: #fff;
 }
@@ -80,27 +79,17 @@
   margin-top: 20px;
 }
 
-.network-visualization {
-  margin-top: 20px;
+.game-boards {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.game-instance {
+  margin: 10px;
+}
+
+.game-instance h4 {
   text-align: center;
-}
-
-.network-visualization svg {
-  border: 1px solid #ddd;
-  background-color: #f9f9f9;
-}
-
-.network-visualization .neuron {
-  fill: #4caf50;
-  stroke: #333;
-  stroke-width: 1px;
-  transition: fill 0.3s;
-}
-
-.network-visualization .neuron:hover {
-  fill: #ff9800;
-}
-
-.network-visualization line {
-  transition: stroke 0.3s, stroke-width 0.3s;
+  margin-top: 10px;
 }

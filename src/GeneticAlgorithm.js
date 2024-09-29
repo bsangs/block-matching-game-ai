@@ -2,19 +2,14 @@ import NeuralNetwork from './NeuralNetwork';
 import { canPlaceBlock } from './utils';
 
 class GeneticAlgorithm {
-  constructor(populationSize = 50) {
+  constructor(populationSize = 10) {
     this.populationSize = populationSize;
     this.population = [];
     this.generation = 1;
-    this.currentIndex = 0;
 
     for (let i = 0; i < this.populationSize; i++) {
       this.population.push(new AIPlayer());
     }
-  }
-
-  getCurrentAI() {
-    return this.population[this.currentIndex % this.population.length];
   }
 
   nextGeneration() {
@@ -22,29 +17,29 @@ class GeneticAlgorithm {
     this.selection();
     this.crossover();
     this.mutation();
-    this.currentIndex = 0;
     this.generation++;
+    // 새로운 세대를 위해 각 AIPlayer의 gameOver 플래그와 fitness를 초기화
+    this.population.forEach((ai) => {
+      ai.gameOver = false;
+      ai.fitness = 0;
+    });
   }
 
   evaluateFitness() {
-    // 이미 AIPlayer에서 fitness를 설정함
+    // AIPlayer 인스턴스에서 이미 fitness를 설정함
   }
 
   selection() {
-    // 상위 20% 선택
+    // 상위 2개 유전자 선택
     this.population.sort((a, b) => b.fitness - a.fitness);
-    const survivors = this.population.slice(
-      0,
-      Math.floor(this.populationSize * 0.2)
-    );
-    this.population = survivors;
+    this.population = this.population.slice(0, 2);
   }
 
   crossover() {
     const offspring = [];
     while (this.population.length + offspring.length < this.populationSize) {
-      const parentA = this.randomSelection();
-      const parentB = this.randomSelection();
+      const parentA = this.population[0];
+      const parentB = this.population[1];
       const childNetwork = NeuralNetwork.crossover(parentA.network, parentB.network);
       offspring.push(new AIPlayer(childNetwork));
     }
@@ -53,25 +48,8 @@ class GeneticAlgorithm {
 
   mutation() {
     for (let ai of this.population) {
-      ai.network.mutate(0.01); // 10% 확률로 돌연변이
+      ai.network.mutate(0.1); // 돌연변이 확률 조정 가능
     }
-  }
-
-  randomSelection() {
-    // 룰렛 휠 선택 방법
-    const totalFitness = this.population.reduce(
-      (sum, ai) => sum + ai.fitness,
-      0
-    );
-    let threshold = Math.random() * totalFitness;
-    let runningSum = 0;
-    for (let ai of this.population) {
-      runningSum += ai.fitness;
-      if (runningSum >= threshold) {
-        return ai;
-      }
-    }
-    return this.population[0];
   }
 }
 
@@ -81,6 +59,7 @@ class AIPlayer {
       network ||
       new NeuralNetwork(64 + 3 * 64, [128, 64], 3 * 64); // 입력, 은닉층, 출력 노드 수 조정
     this.fitness = 0;
+    this.gameOver = false;
   }
 
   getAction(board, blocks) {
