@@ -57,7 +57,7 @@ class GeneticAlgorithm {
 
   mutation(offspring) {
     for (let ai of offspring) {
-      ai.network.mutate(0.05); // 돌연변이 확률을 낮게 설정
+      ai.network.mutate(0.3); // 돌연변이 확률을 낮게 설정
     }
   }
 }

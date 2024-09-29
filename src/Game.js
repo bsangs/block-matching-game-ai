@@ -20,7 +20,7 @@ function Game() {
 
   // 초기 유전 알고리즘 설정
   useEffect(() => {
-    const ga = new GeneticAlgorithm(20); // 10개의 유전자
+    const ga = new GeneticAlgorithm(50); // 50개의 유전자
     setGeneticAlgorithm(ga);
     setAiPlayers(ga.population);
   }, []);
